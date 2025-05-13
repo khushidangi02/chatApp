@@ -4,7 +4,7 @@ pipeline {
     environment {
         DOCKER_HUB_CREDENTIALS = credentials('dockerHub')  
         EC2_SSH_CREDENTIALS = credentials('EC2SSH')      
-        DOCKER_IMAGE = "taharamakda/chatapp" 
+        DOCKER_IMAGE = "image/tage" 
         EC2_INSTANCE_IP = "51.21.219.64"            
     }
 
@@ -19,7 +19,7 @@ pipeline {
             steps {
                 echo 'Cloning the repository...'
                 // Use 'main' if your repo uses it instead of 'master'
-                sh 'git clone -b main https://github.com/TahaRamkda/chatApp.git'
+                sh 'git clone -b main image:tag'
             }
         }
         stage('Check Workspace Files') {
@@ -32,7 +32,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 echo 'Building the Docker image...'
-                sh 'docker build -t taharamakda/chatapp:latest -f chatApp/Dockerfile chatApp'
+                sh 'docker build -t image:latest -f chatApp/Dockerfile chatApp'
             }
         }
 
@@ -55,10 +55,10 @@ pipeline {
             sshagent(['EC2SSH']) {
                  sh '''
 ssh -o StrictHostKeyChecking=no ubuntu@51.21.219.64 <<EOF
-docker pull taharamakda/chatapp:latest
+docker pull image/chatapp:latest
 docker stop chatapp || true
 docker rm chatapp || true
-docker run -d -p 9000:9000 --name chatapp taharamakda/chatapp:latest
+docker run -d -p 9000:9000 --name chatapp image/chatapp:latest
 EOF
 '''
 
